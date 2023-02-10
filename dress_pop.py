@@ -20,8 +20,11 @@ def get_art_parameters():
         inquirer.Text('text',
                       message='Escreva o texto que você quer transformar: '),
         inquirer.List('size', 
-                      message='Selecione o tamanho do seu quadro:',
-                      choices=['30 x 30', '30 x 40.5', '60 x 81']
+                      message='Escolha o tamanho do seu quadro:',
+                      choices=['30 x 30', '30 x 40.5', '60 x 81']),
+        inquirer.List('color_scheme', 
+                      message='Escolha o esquema de cores:',
+                      choices=['Vermelhos', 'Verdes', 'Azuis', 'Mix']
                      )
     ]
 
@@ -30,18 +33,19 @@ def get_art_parameters():
 
     # Parses the answers into their respective parameters
     text = answers['text']
+    scheme = answers['color_scheme']
     width = float(answers['size'].split('x')[0])
     height = float(answers['size'].split('x')[1])
 
-    return text, width, height
+    return text, scheme, width, height
 
 def main():
 
     # Prompts the user for the art parameters
     input = get_art_parameters()
-    saturation = 0.8
-    colors = make_colors(input[0], saturation)
-    make_art(colors, input[1], input[2])
+    saturation = 0.7
+    colors = make_colors(input[0], saturation, input[1])
+    make_art(colors, input[2], input[3])
 
 if __name__ == '__main__':
     main()

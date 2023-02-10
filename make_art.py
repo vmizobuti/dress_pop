@@ -53,17 +53,18 @@ def make_art(colors, width, height):
         gradient_colors.append(ai_color)
     
     gradient = doc.Gradients.Add()
-    gradient.Type = 1
+    gradient.Type = 2
 
     # Modifies the gradient for each color in colors
     for i in range(len(colors)):
         color_i = gradient.GradientStops.Add()
         color_i.RampPoint = 100/(len(colors) - 1) * i
-        print(100/(len(colors) - 1) * i)
         color_i.Color = gradient_colors[i]
     
     # Changes the shape color to the newly created gradient
     gradientColor = win32.Dispatch("Illustrator.GradientColor")
     gradientColor.Gradient = gradient
+    gradientColor.Origin = [0.0, 0.0]
+    gradientColor.HiliteLength = c2p(120)
     rectangle.FillColor = gradientColor
     rectangle.Stroked = False

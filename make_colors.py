@@ -57,6 +57,10 @@ def hsl_to_rgb(color):
     https://www.baeldung.com/cs/convert-color-hsl-rgb
     """
     
+    # Adjusts negative hues to their positive values
+    if color[0] < 0:
+        color[0] = 360 + color[0]
+
     # Computes the chroma value
     chroma = (1 - abs(2*color[2] - 1)) * color[1]
 
@@ -89,7 +93,7 @@ def hsl_to_rgb(color):
     
     return rgb_color
 
-def make_colors(text, saturation):
+def make_colors(text, saturation, scheme):
     """
     Creates a list of RGB colors based on the audio of a text.
     The saturation level of those colors are decided by the user.
@@ -111,7 +115,7 @@ def make_colors(text, saturation):
 
     # Divides the sound into chunks of data. Each chunk will represent
     # a color later in the process
-    number_of_chunks = 16
+    number_of_chunks = 5
     chunk_size = round(len(data)/number_of_chunks)
     partitions = [data[i:i + chunk_size] for i in \
                   range(0, len(data), chunk_size)]
@@ -132,16 +136,25 @@ def make_colors(text, saturation):
     mean_bounds = [min(list_of_means), max(list_of_means)] 
     max_bounds = [min(list_of_max), max(list_of_max)]  
     
+    # Defines the hue bounds based on the color scheme from the user input
+    hue_bounds = []
+    if scheme == 'Vermelhos':
+        hue_bounds = [-75, 15]
+    elif scheme == 'Verdes':
+        hue_bounds = [75, 150]
+    elif scheme == 'Azuis':
+        hue_bounds = [180, 240]
+    elif scheme == 'Mix':
+        hue_bounds = [-120, 60]
+    
     # Remaps the mean values to their respective hue value
-    hue_bounds = [0, 360]
     hue = []
-
     for mean in list_of_means:
         hue_value = round(remap(mean, mean_bounds, hue_bounds))
         hue.append(hue_value)
     
     # Remaps the max values to their respective lightness value
-    light_bounds = [0.2, 0.9]
+    light_bounds = [0.1, 0.8]
     lightness = []
 
     for value in list_of_max:
@@ -161,7 +174,9 @@ def make_colors(text, saturation):
         rgb_colors.append(rgb_color)
     
     # Remove the last color from the list, that is typically Black
-    # due to the fading of  the audio
+    # due to the fading of  the audio, and add White to the extremes
     rgb_colors.pop(len(rgb_colors) - 1)
+    rgb_colors.append([255, 255, 255])
+    rgb_colors.insert(0, [255, 255, 255])
 
     return rgb_colors
