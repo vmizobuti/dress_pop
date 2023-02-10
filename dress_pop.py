@@ -4,78 +4,44 @@
 # 
 # Versão: 1.0
 
-from gtts import gTTS
-from pydub import AudioSegment
-import matplotlib.pyplot as plt
-import numpy as np
+from make_art import make_art
+from make_colors import make_colors
+import inquirer
 
-def text_to_speech(text):
+def get_art_parameters():
     """
-    Transforms an input text into an MP3 file.
+    Gets the parameters to generate an art.
+    The user will input the art size, a text and a mood
+    for design generation.
     """
-    
-    # Transforms a text into an MP3 file using gtts
-    tts = gTTS(text, lang='pt-br')
 
-    # Saves the file in the current directory given a filename
-    filename = text + ".mp3"
-    tts.save(filename)
+    # Creates the questions that will be answered by the user
+    questions = [
+        inquirer.Text('text',
+                      message='Escreva o texto que você quer transformar: '),
+        inquirer.List('size', 
+                      message='Selecione o tamanho do seu quadro:',
+                      choices=['30 x 30', '30 x 40.5', '60 x 81']
+                     )
+    ]
 
-    return filename
+    # Instantiates the questions
+    answers = inquirer.prompt(questions)
 
-def get_audio_parameters(filepath):
-    """
-    Gets all sound parameters from a given MP3 file.
-    """
-    
-    # Reads the MP3 file using pydub
-    audio = AudioSegment.from_mp3(filepath)
+    # Parses the answers into their respective parameters
+    text = answers['text']
+    width = float(answers['size'].split('x')[0])
+    height = float(answers['size'].split('x')[1])
 
-    # Gets the frame rate, frame count, duration and samples
-    # from a given file
-    frame_rate = audio.frame_rate
-    frame_count = audio.frame_count()
-    duration = audio.duration_seconds
-    data = audio.get_array_of_samples()
-
-    return frame_rate, frame_count, duration, data
-
-def plot_sound_wave(frame_rate, frame_count, duration, data):
-    """
-    Plots the sound wave of a given MP3 file by passing its parameters.
-    """
-    
-    # Creates the timestamp for the audio
-    timestamp = np.linspace(0, frame_count/frame_rate, num=int(frame_count))
-    
-    # Plots the sound wave using matplotlib functions
-    plt.figure(figsize=(15, 5))
-    plt.plot(timestamp, data)
-    plt.title('Teste')
-    plt.ylabel('Amplitude')
-    plt.xlabel('Time (s)')
-    plt.xlim(0, duration)
-    plt.show()
+    return text, width, height
 
 def main():
 
-    # Gets a text from the user to input in the process
-    text = input("Escreva o texto que você quer transformado:")
-
-    # Transforms the input text to speech audio
-    filename = text_to_speech(text)
-
-    # Gets the parameters from the speech audio
-    parameters = get_audio_parameters(filename)
-
-    # Splits the parameters into individual values
-    fr = parameters[0]
-    fc = parameters[1]
-    dt = parameters[2]
-    da = parameters[3]
-
-    # Plots the sound wave given audio parameters
-    plot_sound_wave(fr, fc, dt, da)
+    # Prompts the user for the art parameters
+    input = get_art_parameters()
+    saturation = 0.8
+    colors = make_colors(input[0], saturation)
+    make_art(colors, input[1], input[2])
 
 if __name__ == '__main__':
     main()
