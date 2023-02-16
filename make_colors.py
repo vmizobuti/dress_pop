@@ -154,7 +154,7 @@ def make_colors(text, saturation, scheme):
         hue.append(hue_value)
     
     # Remaps the max values to their respective lightness value
-    light_bounds = [0.1, 0.8]
+    light_bounds = [0.3, 0.8]
     lightness = []
 
     for value in list_of_max:
@@ -176,7 +176,5 @@ def make_colors(text, saturation, scheme):
     # Remove the last color from the list, that is typically Black
     # due to the fading of  the audio, and add White to the extremes
     rgb_colors.pop(len(rgb_colors) - 1)
-    rgb_colors.append([255, 255, 255])
-    rgb_colors.insert(0, [255, 255, 255])
 
     return rgb_colors

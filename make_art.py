@@ -53,7 +53,7 @@ def make_art(colors, width, height):
         gradient_colors.append(ai_color)
     
     gradient = doc.Gradients.Add()
-    gradient.Type = 2
+    gradient.Type = 1
 
     # Modifies the gradient for each color in colors
     for i in range(len(colors)):
