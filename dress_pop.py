@@ -4,7 +4,7 @@
 # 
 # Versão: 1.0
 
-from make_art import make_art
+from make_art import deprecated_make_art
 from make_colors import make_colors
 from make_sound import sound_parameters
 import inquirer
@@ -47,7 +47,7 @@ def main():
     saturation = 0.7
     data = sound_parameters(input[0])
     colors = make_colors(data, 5, saturation, input[1])
-    make_art(colors, input[2], input[3])
+    deprecated_make_art(colors, input[2], input[3])
 
 if __name__ == '__main__':
     main()
