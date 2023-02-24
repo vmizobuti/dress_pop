@@ -1,3 +1,8 @@
+# make_sound.py
+#
+# Functions for generating a sound based on a text
+# and returning its wave parameters.
+
 from gtts import gTTS
 from pydub import AudioSegment
 from os import remove
@@ -16,7 +21,7 @@ def text_to_speech(text):
 
     return filename
 
-def get_audio_parameters(text):
+def sound_parameters(text):
     """
     Gets all sound parameters from a given MP3 file.
     """

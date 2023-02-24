@@ -1,3 +1,8 @@
+# make_art.py
+#
+# Functions for generating an art in Adobe Illustrator
+# based on a set of colors and sound parameters.
+
 import win32com.client as win32
 
 def c2p(number):

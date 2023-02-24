@@ -1,3 +1,9 @@
+# make_colors.py
+#
+# Functions for generating a list of RGB colors based on a list
+# of numeric values.
+
+
 def remap(value, old_domain, new_domain):
     """
     Remaps a number between different domains.
