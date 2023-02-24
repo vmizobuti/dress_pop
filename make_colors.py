@@ -1,38 +1,3 @@
-from gtts import gTTS
-from pydub import AudioSegment
-from os import remove
-
-def text_to_speech(text):
-    """
-    Transforms an input text into an MP3 file.
-    """
-    
-    # Transforms a text into an MP3 file using gtts
-    tts = gTTS(text, lang='pt-br')
-
-    # Saves the file in the current directory given a filename
-    filename = text + ".mp3"
-    tts.save(filename)
-
-    return filename
-
-def get_audio_parameters(filepath):
-    """
-    Gets all sound parameters from a given MP3 file.
-    """
-    
-    # Reads the MP3 file using pydub
-    audio = AudioSegment.from_mp3(filepath)
-
-    # Gets the frame rate, frame count, duration and samples
-    # from a given file
-    frame_rate = audio.frame_rate
-    frame_count = audio.frame_count()
-    duration = audio.duration_seconds
-    data = audio.get_array_of_samples()
-
-    return frame_rate, frame_count, duration, data
-
 def remap(value, old_domain, new_domain):
     """
     Remaps a number between different domains.
@@ -93,18 +58,11 @@ def hsl_to_rgb(color):
     
     return rgb_color
 
-def make_colors(text, saturation, scheme):
+def make_colors(parameters, number_of_colors, saturation, scheme):
     """
-    Creates a list of RGB colors based on the audio of a text.
+    Creates a list of RGB colors based on the audio parameters.
     The saturation level of those colors are decided by the user.
     """
-
-    # Transforms the input text to speech audio
-    filename = text_to_speech(text)
-
-    # Gets the parameters from the speech audio and deletes the file
-    parameters = get_audio_parameters(filename)
-    remove(filename)
 
     # Removes all negative values from the dataset, assuming that the
     # audio levels have some kind of symmetry
@@ -115,8 +73,7 @@ def make_colors(text, saturation, scheme):
 
     # Divides the sound into chunks of data. Each chunk will represent
     # a color later in the process
-    number_of_chunks = 5
-    chunk_size = round(len(data)/number_of_chunks)
+    chunk_size = round(len(data)/number_of_colors)
     partitions = [data[i:i + chunk_size] for i in \
                   range(0, len(data), chunk_size)]
 
@@ -163,7 +120,7 @@ def make_colors(text, saturation, scheme):
     
     # Composes the HSL color given a hue, saturation and lightness value
     hsl_colors = []
-    for i in range(number_of_chunks):
+    for i in range(number_of_colors):
         color = [hue[i], saturation, lightness[i]]
         hsl_colors.append(color)
 

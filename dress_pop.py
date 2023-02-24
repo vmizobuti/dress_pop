@@ -6,6 +6,7 @@
 
 from make_art import make_art
 from make_colors import make_colors
+from make_sound import get_audio_parameters
 import inquirer
 
 def get_art_parameters():
@@ -44,7 +45,8 @@ def main():
     # Prompts the user for the art parameters
     input = get_art_parameters()
     saturation = 0.7
-    colors = make_colors(input[0], saturation, input[1])
+    data = get_audio_parameters(input[0])
+    colors = make_colors(data, 15, saturation, input[1])
     make_art(colors, input[2], input[3])
 
 if __name__ == '__main__':
