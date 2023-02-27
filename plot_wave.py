@@ -1,7 +1,11 @@
+# plot_wave.py
+#
+# Plots the sound wave for a given group of audio parameters.
+
 import matplotlib.pyplot as plt
 import numpy as np
 
-def plot_sound_wave(frame_rate, frame_count, duration, data, title):
+def plot_wave(frame_rate, frame_count, duration, data, title):
     """
     Plots the sound wave of a given MP3 file by passing its parameters.
     """
@@ -11,7 +15,7 @@ def plot_sound_wave(frame_rate, frame_count, duration, data, title):
     
     # Plots the sound wave using matplotlib functions
     plt.figure(figsize=(15, 5))
-    plt.plot(timestamp, data, linewidth=0.1)
+    plt.plot(timestamp, data, linewidth=0.5)
     plt.title(title)
     plt.ylabel('Amplitude')
     plt.xlabel('Time (s)')

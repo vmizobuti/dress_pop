@@ -7,6 +7,7 @@
 from make_art import deprecated_make_art
 from make_colors import make_colors
 from make_sound import sound_parameters
+from plot_wave import plot_wave
 import inquirer
 
 def query():
@@ -19,12 +20,12 @@ def query():
     # Creates the questions that will be answered by the user
     questions = [
         inquirer.Text('text',
-                      message='Escreva o texto que você quer transformar: '),
+                      message='Escreva o texto que você quer transformar'),
         inquirer.List('size', 
-                      message='Escolha o tamanho do seu quadro:',
+                      message='Escolha o tamanho do seu quadro',
                       choices=['30 x 30', '30 x 40.5', '60 x 81']),
         inquirer.List('scheme', 
-                      message='Escolha o esquema de cores:',
+                      message='Escolha o esquema de cores',
                       choices=['Vermelhos', 'Verdes', 'Azuis', 'Mix']
                      )
     ]
@@ -44,10 +45,12 @@ def main():
 
     # Prompts the user for the art parameters
     input = query()
-    saturation = 0.7
     data = sound_parameters(input[0])
-    colors = make_colors(data, 5, saturation, input[1])
-    deprecated_make_art(colors, input[2], input[3])
+    plot_wave(data[0], data[1], data[2], data[3], input[0])
+
+    #saturation = 0.7
+    #colors = make_colors(data, 5, saturation, input[1])
+    #deprecated_make_art(colors, input[2], input[3])
 
 if __name__ == '__main__':
     main()
