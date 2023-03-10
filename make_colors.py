@@ -3,6 +3,7 @@
 # Functions for generating a list of RGB colors based on a list
 # of numeric values.
 
+from sys import exit
 
 def remap(value, old_domain, new_domain):
     """
@@ -64,12 +65,40 @@ def hsl_to_rgb(color):
     
     return rgb_color
 
-def make_colors(parameters, number_of_colors, saturation, scheme):
+def make_mono(palette):
+    """
+    Returns two RGB colors based on the palette and saturation
+    values. One of them is always white.
+    """
+
+    colors = []
+
+    if palette == 'Vermelhos':
+        colors.append([240, 74, 73])
+        colors.append([255, 255, 255])
+    elif palette == 'Verdes':
+        colors.append([111, 232, 107])
+        colors.append([255, 255, 255])
+    elif palette == 'Azuis':
+        colors.append([47, 127, 224])
+        colors.append([255, 255, 255])
+    elif palette == 'Amarelos':
+        colors.append([237, 210, 53])
+        colors.append([255, 255, 255])
+    elif palette == 'Mix':
+        exit("Mix de cores só está disponível para o esquema de Gradiente.")
+        
+    return colors
+
+def make_grad(parameters, palette, saturation):
     """
     Creates a list of RGB colors based on the audio parameters.
     The saturation level of those colors are decided by the user.
     """
 
+    # Defines the number of colors
+    number_of_colors = 5
+    
     # Removes all negative values from the dataset, assuming that the
     # audio levels have some kind of symmetry
     data = []
@@ -77,8 +106,7 @@ def make_colors(parameters, number_of_colors, saturation, scheme):
         if value > 0:
             data.append(value)
 
-    # Divides the sound into chunks of data. Each chunk will represent
-    # a color later in the process
+    # Creates the data chunks for color management
     chunk_size = round(len(data)/number_of_colors)
     partitions = [data[i:i + chunk_size] for i in \
                   range(0, len(data), chunk_size)]
@@ -101,14 +129,16 @@ def make_colors(parameters, number_of_colors, saturation, scheme):
     
     # Defines the hue bounds based on the color scheme from the user input
     hue_bounds = []
-    if scheme == 'Vermelhos':
-        hue_bounds = [-75, 15]
-    elif scheme == 'Verdes':
-        hue_bounds = [75, 150]
-    elif scheme == 'Azuis':
-        hue_bounds = [180, 240]
-    elif scheme == 'Mix':
-        hue_bounds = [-120, 60]
+    if palette == 'Vermelhos':
+        hue_bounds = [-25, 20]
+    elif palette == 'Verdes':
+        hue_bounds = [75, 120]
+    elif palette == 'Azuis':
+        hue_bounds = [190, 215]
+    elif palette == 'Amarelos':
+        hue_bounds = [35, 60]
+    elif palette == 'Mix':
+        hue_bounds = [0, 360]
     
     # Remaps the mean values to their respective hue value
     hue = []
@@ -117,7 +147,7 @@ def make_colors(parameters, number_of_colors, saturation, scheme):
         hue.append(hue_value)
     
     # Remaps the max values to their respective lightness value
-    light_bounds = [0.3, 0.8]
+    light_bounds = [0.3, 0.9]
     lightness = []
 
     for value in list_of_max:
@@ -135,9 +165,5 @@ def make_colors(parameters, number_of_colors, saturation, scheme):
     for color in hsl_colors:
         rgb_color = hsl_to_rgb(color)
         rgb_colors.append(rgb_color)
-    
-    # Remove the last color from the list, that is typically Black
-    # due to the fading of  the audio, and add White to the extremes
-    rgb_colors.pop(len(rgb_colors) - 1)
 
     return rgb_colors
