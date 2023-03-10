@@ -73,7 +73,7 @@ def make_colors(parameters, number_of_colors, saturation, scheme):
     # Removes all negative values from the dataset, assuming that the
     # audio levels have some kind of symmetry
     data = []
-    for value in parameters[3]:
+    for value in parameters:
         if value > 0:
             data.append(value)
 

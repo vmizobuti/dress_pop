@@ -48,9 +48,9 @@ def main():
     data = sound_parameters(input[0])
     plot_wave(data[0], data[1], data[2], data[3], input[0])
 
-    #saturation = 0.7
-    #colors = make_colors(data, 5, saturation, input[1])
-    #deprecated_make_art(colors, input[2], input[3])
+    saturation = 0.7
+    colors = make_colors(data[3], 5, saturation, input[1])
+    deprecated_make_art(colors, input[2], input[3])
 
 if __name__ == '__main__':
     main()
