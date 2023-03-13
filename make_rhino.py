@@ -3,6 +3,10 @@
 # Functions for generating the art using RhinoScript.
 # The generative system is based on a set of sound parameters.
 
+import rhino3dm as r3dm
+import compute_rhino3d.Util
+import compute_rhino3d.Curve
+
 def remap(value, old_domain, new_domain):
     """
     Remaps a number between different domains.
@@ -22,8 +26,17 @@ def remap(value, old_domain, new_domain):
 
 def make_rhino(parameters, width, height, colors, filename):
 
+    # Reads and allocates the Rhino-Compute's authentication token
+    with open('authToken.txt', 'r') as file:
+        token = file.read().rstrip()
+    #compute_rhino3d.Util.authToken = token
+    compute_rhino3d.Util.url = "http://localhost:8081/"
+
+    # Creates the 3DM file for all geometric operations
+    model = r3dm.File3dm()
+
     # Creates the data chunks for point coordinates
-    number_of_columns = 15
+    number_of_columns = 30
     chunk_size = round(len(parameters)/number_of_columns)
     partitions = [parameters[i:i + chunk_size] for i in \
                   range(0, len(parameters), chunk_size)]
@@ -51,5 +64,28 @@ def make_rhino(parameters, width, height, colors, filename):
     y_val = []
     for value in sum_values:
         y_val.append(remap(value, data_bounds, curve_bounds))
+    
+    # Creates the points for interpolation based on their (X, Y) values
+    # and adds them to a Point3dList
+    points = []
+    for i in range(len(x_val)):
+        point = r3dm.Point3d(x_val[i], y_val[i], 0)
+        points.append(point)
+
+    # Interpolates the points in a curve with start and end tangents
+    # to the X-axis
+    vector = r3dm.Vector3d(1, 0, 0)
+    curve = compute_rhino3d.Curve.CreateInterpolatedCurve2(points, 3, 2,
+                                                           vector, vector)
+    
+    ext_start = compute_rhino3d.Curve.Extend2(curve, 1, width/2, 0)
+    ext_end = compute_rhino3d.Curve.Extend2(ext_start, 2, width/2, 0)
+
+    print(type(ext_end))
+    
+    model.Objects.AddCurve(ext_end)
+
+    # Saves the 3DM file after all geometric operations are completed
+    model.Write('geometry.3dm')
     
     return
