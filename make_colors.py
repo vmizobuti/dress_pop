@@ -97,7 +97,7 @@ def make_grad(parameters, palette, saturation):
     """
 
     # Defines the number of colors
-    number_of_colors = 5
+    number_of_colors = 4
     
     # Removes all negative values from the dataset, assuming that the
     # audio levels have some kind of symmetry
@@ -136,7 +136,7 @@ def make_grad(parameters, palette, saturation):
     elif palette == 'Azuis':
         hue_bounds = [190, 215]
     elif palette == 'Amarelos':
-        hue_bounds = [35, 60]
+        hue_bounds = [45, 60]
     elif palette == 'Mix':
         hue_bounds = [0, 360]
     
@@ -165,5 +165,8 @@ def make_grad(parameters, palette, saturation):
     for color in hsl_colors:
         rgb_color = hsl_to_rgb(color)
         rgb_colors.append(rgb_color)
+    
+    # Adds white to the list as the background color
+    rgb_colors.append([255, 255, 255])
 
     return rgb_colors

@@ -5,8 +5,7 @@
 
 import rhino3dm as r3dm
 import compute_rhino3d.Util
-
-from compute_rhino3d import Curve, Brep, AreaMassProperties
+from compute_rhino3d import Curve, Brep, Intersection, AreaMassProperties
 
 def remap(value, old_domain, new_domain):
     """
@@ -25,13 +24,23 @@ def remap(value, old_domain, new_domain):
 
     return remapped_value
 
-def make_rhino(parameters, width, height, colors, filename):
+def make_rhino(parameters, width, height, colors, margins):
+    """
+    Creates all the geometry needed for the art based on rhino3dm
+    and Rhino.Compute functions. This function returns the filename
+    of the Rhino file, after all geometric operations are done.
+    """
 
     # Instantiates the Rhino.Compute geometry server
     compute_rhino3d.Util.url = "http://localhost:8081/"
 
     # Creates the 3DM file for all geometric operations
     model = r3dm.File3dm()
+    model.Settings.ModelUnitSystem = r3dm.UnitSystem.Centimeters
+
+    # Adjusts the width and height of the art by reducing the margin values
+    width = width - (2 * margins)
+    height = height - (2 * margins)
 
     # Creates the Layers for each color in the art
     for i in range(len(colors)):
@@ -53,7 +62,7 @@ def make_rhino(parameters, width, height, colors, filename):
         sum_values.append(sum(list))
 
     # Remap the chunks values based on the height of the canvas
-    amplitude_factor = 0.4
+    amplitude_factor = 0.7
     data_bounds = [min(sum_values), max(sum_values)]
     curve_bounds = [-(height * amplitude_factor)/2,
                     (height * amplitude_factor)/2]
@@ -74,46 +83,47 @@ def make_rhino(parameters, width, height, colors, filename):
     # Creates the points for interpolation based on their (X, Y) values
     # and adds them to a list of Point3d
     points = []
+    first = r3dm.Point3d(-width + x_val[0], y_val[0], 0)
+    points.append(first)
     for i in range(len(x_val)):
         point = r3dm.Point3d(x_val[i], y_val[i], 0)
         points.append(point)
+    last = r3dm.Point3d(x_val[number_of_columns - 1] + width, 
+                        y_val[number_of_columns - 1], 0)
+    points.append(last)
 
     # Interpolates the points in a curve with start and end tangents
     # to the X-axis
-    vector = r3dm.Vector3d(1, 0, 0)
-    curve = Curve.CreateInterpolatedCurve2(points, 3, 2, vector, vector)
-   
-    # Extends the curve to guarantee that the offset curves won't
-    # bulge to the inside of the art
-    ext_curve = Curve.Extend2(curve, 1, width, 0)
-    ext_curve = Curve.Extend2(ext_curve, 2, width, 0)
+    pline = r3dm.Polyline(points).ToNurbsCurve()
+    curve = compute_rhino3d.Curve.CreateFilletCornersCurve(pline, height/100,
+                                                            0.01, 0.1)
 
     # Creates the curve bounding box to get the center of the canvas
-    bbox = r3dm.GeometryBase.GetBoundingBox(ext_curve)
+    bbox = r3dm.GeometryBase.GetBoundingBox(curve)
     center = bbox.Center
 
     # Create the base surface for splitting
     normal = r3dm.Vector3d(0, 0, 1)
     pln = r3dm.Plane(center, normal)
-
     p1 = r3dm.Point3d(center.X - (width/2), center.Y - (height/2), 0)
     p2 = r3dm.Point3d(center.X + (width/2), center.Y - (height/2), 0)
     p3 = r3dm.Point3d(center.X + (width/2), center.Y + (height/2), 0)
-    p4 = r3dm.Point3d(center.X - (width/2), center.Y + (height/2), 0)
-    
+    p4 = r3dm.Point3d(center.X - (width/2), center.Y + (height/2), 0) 
     frame = r3dm.Polyline([p1, p2, p3, p4, p1])
     srf = r3dm.Brep.CreateTrimmedPlane(pln, frame.ToNurbsCurve())
 
     # Create all the offsets for the base curve, using the column width
     # as the offset distance
     dist = width/(number_of_columns - 1)
-    number_of_offsets = 40
+    number_of_offsets = 30
     split_curves = []
-    active_pos = ext_curve
-    active_neg = ext_curve
+    active_pos = curve
+    active_neg = curve
+    dir_pos = r3dm.Point3d(0, 1000, 0)
+    dir_neg = r3dm.Point3d(0, -1000, 0)
     for i in range(number_of_offsets):
-        positive = Curve.Offset(active_pos, pln, dist, 0.1, 2)
-        negative = Curve.Offset(active_neg, pln, -dist, 0.1, 2)
+        positive = Curve.Offset1(active_pos, dir_pos, normal, dist, 0.001, 2)
+        negative = Curve.Offset1(active_neg, dir_neg, normal, dist, 0.001, 2)
         split_curves.append(positive[0])
         split_curves.append(negative[0])
         active_pos = positive[0]
@@ -130,22 +140,15 @@ def make_rhino(parameters, width, height, colors, filename):
         i += 2
     
     # Splits the surface using the offset curves and vertical lines
-    split_curves.append(ext_curve)
-    split = Brep.Split3(srf, split_curves, 0.01)
-    
-    # # DEBUGGING
-    # for srf in split:
-    #     model.Objects.AddBrep(srf)
-    # model.Objects.AddCurve(curve)
-    # model.Objects.AddCurve(ext_curve)
-    # model.Write('geometry.3dm')
+    split_curves.append(curve)
+    split = Brep.Split3(srf, split_curves, 0.001)
 
     # Gets the face border and area centroid for each split surface
     borders = []
     centroids = []
     for brep in split:
         edges = Brep.GetWireframe(brep, 0)
-        border = Curve.JoinCurves(edges)[0]
+        border = Curve.JoinCurves1(edges, 0.01)[0]
         amp = AreaMassProperties.Compute(border)['Centroid']
         centroid = r3dm.Point3d(amp['X'], amp['Y'], 0)
         borders.append(border)
@@ -192,7 +195,19 @@ def make_rhino(parameters, width, height, colors, filename):
                     color += 1
                 i += 1
 
+    # Trim the original curve with the art frame
+    ccx = Intersection.CurveCurve(curve, frame.ToNurbsCurve(), 0.01, 0.01)
+    t0 = ccx[0]['ParameterA']
+    t1 = ccx[1]['ParameterA']
+    stroke = curve.Trim(t0, t1)
+
+    # Adds a layer for the stroke curve and adds the curve to the model
+    model.Layers.AddLayer("Stroke", (255, 255, 255, 255))
+    stroke_att = r3dm.ObjectAttributes()
+    stroke_att.LayerIndex = len(model.Layers) - 1
+    model.Objects.AddCurve(stroke, stroke_att)
+
     # Saves the 3DM file after all geometric operations are completed
     model.Write('geometry.3dm')
     
-    return
+    return 'geometry.3dm'

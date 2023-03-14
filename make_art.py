@@ -3,7 +3,15 @@
 # Functions for generating an art in Adobe Illustrator
 # based on a set of colors and sound parameters.
 
+from os import remove, getcwd
 import win32com.client as win32
+import rhinoinside
+
+rhinoinside.load()
+
+import System
+import Rhino
+from Rhino.Geometry import Point3d, Vector3d
 
 def c2p(number):
     """
@@ -17,102 +25,30 @@ def c2p(number):
 
     return conversion
 
-def make_art(colors, width, height):
+def make_art(filename, width, height):
     """
-    Makes an art in Adobe Illustrator using the generative parameters.
-    The art will have a size of width and height, and the text is
-    the input for the generative system.
+    Makes an art in Adobe Illustrator by using a .3DM file's geometry.
+    The art will have a size of width and height, and 
     """
-    
+    # Opens the 3DM file
+    doc = Rhino.RhinoDoc.Open(getcwd() + "\\" + filename)[0]
+
+    # Sets the viewport to Top View
+    viewport = Rhino.Display.RhinoViewport()
+    viewport.SetToPlanView(Point3d(0, 0, 0), 
+                           Vector3d(1, 0, 0),
+                           Vector3d(0, 1, 0), True)
+    doc.Views.ActiveView = 
+    doc.Views.Redraw()
+    ai_file = getcwd() + "\\" + "art.ai"
+    doc.Export(ai_file)
+
     # Instantiates an Application of Adobe Illustrator
-    ai = win32.Dispatch("Illustrator.Application")
+    #ai = win32.Dispatch("Illustrator.Application")
 
     # Converts the width and height values to points
     canvas_width = c2p(width)
     canvas_height = c2p(height)
 
     # Creates a new document using the CMYK color space
-    doc = ai.Documents.Add(2, canvas_width, canvas_height)
-    
-    # Creates the gradient fill from the list of colors
-    gradient_colors = []
-    for color in colors:
-        ai_color = win32.Dispatch("Illustrator.RGBColor")
-        ai_color.Red = color[0]
-        ai_color.Green = color[1]
-        ai_color.Blue = color[2]
-        gradient_colors.append(ai_color)
-    
-    gradient = doc.Gradients.Add()
-    gradient.Type = 1
-    gradient.HiliteAngle = 45
-
-    # Modifies the gradient for each color in colors
-    for i in range(len(colors)):
-        color_i = gradient.GradientStops.Add()
-        color_i.RampPoint = 100/(len(colors) - 1) * i
-        color_i.Color = gradient_colors[i]
-    
-    # Changes the shape color to the newly created gradient
-    gradientColor = win32.Dispatch("Illustrator.GradientColor")
-    gradientColor.Gradient = gradient
-    gradientColor.Origin = [0.0, 0.0]
-    gradientColor.HiliteLength = c2p(120)
-    rectangle.FillColor = gradientColor
-    rectangle.Stroked = False
-
-def deprecated_make_art(colors, width, height):
-    """
-    Makes an art in Adobe Illustrator using the generative parameters.
-    The art will have a size of width and height, and the text is
-    the input for the generative system.
-    """
-    
-    # Instantiates an Application of Adobe Illustrator
-    ai = win32.Dispatch("Illustrator.Application")
-
-    # Converts the width and height values to points
-    canvas_width = c2p(width)
-    canvas_height = c2p(height)
-
-    # Defines the size of the rectangle shape given the
-    # boundaries of the canvas
-    lat_space = 2
-    rect_width = c2p(width - lat_space)
-    rect_height = c2p(height/10)
-
-    # Creates a new document using the CMYK color space
-    doc = ai.Documents.Add(2, canvas_width, canvas_height)
-
-    # Creates a rectangle and aligns it to the center of the canvas
-    top_coord = canvas_height/2 + rect_height/2
-    left_coord = c2p(lat_space/2)
-    rectangle = doc.PathItems.Rectangle(top_coord, 
-                                        left_coord, 
-                                        rect_width, 
-                                        rect_height)
-    
-    # Creates the gradient fill from the list of colors
-    gradient_colors = []
-    for color in colors:
-        ai_color = win32.Dispatch("Illustrator.RGBColor")
-        ai_color.Red = color[0]
-        ai_color.Green = color[1]
-        ai_color.Blue = color[2]
-        gradient_colors.append(ai_color)
-    
-    gradient = doc.Gradients.Add()
-    gradient.Type = 1
-
-    # Modifies the gradient for each color in colors
-    for i in range(len(colors)):
-        color_i = gradient.GradientStops.Add()
-        color_i.RampPoint = 100/(len(colors) - 1) * i
-        color_i.Color = gradient_colors[i]
-    
-    # Changes the shape color to the newly created gradient
-    gradientColor = win32.Dispatch("Illustrator.GradientColor")
-    gradientColor.Angle = 45.0
-    gradientColor.Gradient = gradient
-    rectangle.FillColor = gradientColor
-    rectangle.Stroked = False
+    #doc = ai.Documents.Add(2, canvas_width, canvas_height)

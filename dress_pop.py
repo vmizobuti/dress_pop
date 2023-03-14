@@ -24,7 +24,7 @@ def query():
                       message='Escreva o texto que você quer transformar'),
         inquirer.List('size', 
                       message='Escolha o tamanho do seu quadro',
-                      choices=['30 x 30', '30 x 40.5', '60 x 81']),
+                      choices=['30 x 30', '40.5 x 30', '81 x 60']),
         inquirer.List('scheme',
                       message='Escolha o esquema de cores',
                       choices=['Monocromático', 'Gradiente']),
@@ -63,9 +63,11 @@ def main():
         colors = make_grad(data[3], input[2], saturation)
     
     # Creates the vector-based drawings using Rhinoceros
-    make_rhino(data[3], input[3], input[4], colors, input[0])
+    margins = 3.0
+    geo_file = make_rhino(data[3], input[3], input[4], colors, margins)
 
     # Transforms the Rhinoceros geometry into an Adobe Illustrator file
+    art_file = make_art(geo_file, input[3], input[4])
 
     # Exports the result in a PDF file
 
