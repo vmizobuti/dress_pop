@@ -8,7 +8,7 @@ from make_sound import sound_parameters
 from make_colors import make_mono, make_grad
 from make_rhino import make_rhino
 from make_art import make_art
-from plot_wave import plot_wave
+from os import startfile, getcwd
 import inquirer
 
 def query():
@@ -30,7 +30,7 @@ def query():
                       choices=['Monocromático', 'Gradiente']),
         inquirer.List('colors', 
                       message='Escolha a paleta de cores',
-                      choices=['Vermelhos', 'Verdes', 'Azuis', 'Amarelos', 'Mix']
+                      choices=['Vermelhos', 'Verdes', 'Azuis', 'Amarelos', 'Cinzas']
                      )
     ]
 
@@ -53,7 +53,8 @@ def main():
 
     # Gets the parameters based on the text input
     data = sound_parameters(input[0])
-    
+    print("Coletamos todos os parâmetros de som do seu texto.")
+
     # Creates the color palette based on user input
     saturation = 0.7
     colors = []
@@ -61,17 +62,21 @@ def main():
         colors = make_mono(input[2])
     elif input[1] == 'Gradiente':
         colors = make_grad(data[3], input[2], saturation)
+    print("Criamos uma paleta especial para sua arte, com base nesse som.")
+    print("Trabalhando nas geometrias do seu quadro...")
     
     # Creates the vector-based drawings using Rhinoceros
-    margins = 3.0
+    margins = 1.0
     geo_file = make_rhino(data[3], input[3], input[4], colors, margins)
+    print("Geometria finalizada!")
+    print("Estamos dando os últimos toques no seu quadro...")
 
     # Transforms the Rhinoceros geometry into an Adobe Illustrator file
-    art_file = make_art(geo_file, input[3], input[4])
+    art_file = make_art(geo_file, input[3], input[4], margins)
 
-    # Exports the result in a PDF file
-
-    #plot_wave(data[0], data[1], data[2], data[3], input[0])
+    # Opens the resulting PDF file
+    pdf_file = getcwd() + "\\" + "art.pdf"
+    startfile(pdf_file)
 
 if __name__ == '__main__':
     main()

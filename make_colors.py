@@ -137,8 +137,9 @@ def make_grad(parameters, palette, saturation):
         hue_bounds = [190, 215]
     elif palette == 'Amarelos':
         hue_bounds = [45, 60]
-    elif palette == 'Mix':
+    elif palette == 'Cinzas':
         hue_bounds = [0, 360]
+        saturation = 0
     
     # Remaps the mean values to their respective hue value
     hue = []
@@ -168,5 +169,5 @@ def make_grad(parameters, palette, saturation):
     
     # Adds white to the list as the background color
     rgb_colors.append([255, 255, 255])
-
+    
     return rgb_colors
