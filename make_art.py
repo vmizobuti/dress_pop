@@ -81,14 +81,13 @@ def make_art(filename, width, height, margins):
 
     # Adjusts the main waveline stroke width
     for layer in art_doc.Layers:
-        if layer.Name == 'Stroke':
-            art_doc.Selection = layer.PathItems.Item(1)
-            layer.PathItems.Item(1).StrokeWidth = height
+        if layer.Name == "Stroke":
+            layer.PathItems.Item(1).StrokeWidth = height/2
     
     # Groups all objects and aligns it to center of the artboard
     group = art_doc.GroupItems.Add()
     for path in range(art_doc.PathItems.Count):
-        art_doc.PathItems[path + 1].Move(group, 2)
+        art_doc.PathItems[path + 1].Move(group, 1)
     top_pos_x = c2p(margins) - canvas_width/2
     top_pos_y = canvas_height/2 - c2p(margins)
     group.Position = (top_pos_x, top_pos_y)

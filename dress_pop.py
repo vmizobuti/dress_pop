@@ -66,13 +66,13 @@ def main():
     print("Trabalhando nas geometrias do seu quadro...")
     
     # Creates the vector-based drawings using Rhinoceros
-    margins = 1.0
+    margins = 1.5
     geo_file = make_rhino(data[3], input[3], input[4], colors, margins)
     print("Geometria finalizada!")
     print("Estamos dando os últimos toques no seu quadro...")
 
     # Transforms the Rhinoceros geometry into an Adobe Illustrator file
-    art_file = make_art(geo_file, input[3], input[4], margins)
+    make_art(geo_file, input[3], input[4], margins)
 
     # Opens the resulting PDF file
     pdf_file = getcwd() + "\\" + "art.pdf"
