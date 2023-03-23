@@ -137,7 +137,8 @@ def make_grad(parameters, palette, saturation):
     elif palette == 'Azuis':
         hue_bounds = [190, 215]
     elif palette == 'Amarelos':
-        hue_bounds = [45, 60]
+        hue_bounds = [48, 51]
+        saturation = 0.82
     elif palette == 'Cinzas':
         hue_bounds = [0, 360]
         saturation = 0
@@ -149,7 +150,7 @@ def make_grad(parameters, palette, saturation):
         hue.append(hue_value)
     
     # Remaps the max values to their respective lightness value
-    light_bounds = [0.3, 0.9]
+    light_bounds = [0.4, 0.9]
     lightness = []
 
     for value in list_of_max:
