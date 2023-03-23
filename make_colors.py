@@ -85,8 +85,9 @@ def make_mono(palette):
     elif palette == 'Amarelos':
         colors.append([237, 210, 53])
         colors.append([255, 255, 255])
-    elif palette == 'Mix':
-        exit("Mix de cores só está disponível para o esquema de Gradiente.")
+    elif palette == 'Cinzas':
+        colors.append([160, 160, 160])
+        colors.append([255, 255, 255])
         
     return colors
 
