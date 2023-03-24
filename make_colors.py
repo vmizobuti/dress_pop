@@ -4,6 +4,7 @@
 # of numeric values.
 
 from sys import exit
+from random import shuffle
 
 def remap(value, old_domain, new_domain):
     """
@@ -91,14 +92,14 @@ def make_mono(palette):
         
     return colors
 
-def make_grad(parameters, palette, saturation):
+def make_grad(parameters, palette):
     """
     Creates a list of RGB colors based on the audio parameters.
     The saturation level of those colors are decided by the user.
     """
 
     # Defines the number of colors
-    number_of_colors = 4
+    number_of_colors = 3
     
     # Removes all negative values from the dataset, assuming that the
     # audio levels have some kind of symmetry
@@ -126,21 +127,34 @@ def make_grad(parameters, palette, saturation):
         list_of_max.append(max_value)
     
     mean_bounds = [min(list_of_means), max(list_of_means)] 
-    max_bounds = [min(list_of_max), max(list_of_max)]  
+    max_bounds = [min(list_of_max), max(list_of_max)]
+    
+    # Instantiates the hue and lightness domains, that will be adjusted
+    # according to their color scheme
+    light_bounds = []
+    hue_bounds = []
     
     # Defines the hue bounds based on the color scheme from the user input
-    hue_bounds = []
+
     if palette == 'Vermelhos':
-        hue_bounds = [-25, 20]
+        hue_bounds = [-15, 10]
+        light_bounds = [0.40, 0.80]
+        saturation = 0.8
     elif palette == 'Verdes':
-        hue_bounds = [75, 120]
+        hue_bounds = [80, 90]
+        light_bounds = [0.30, 0.90]
+        saturation = 0.8
     elif palette == 'Azuis':
         hue_bounds = [190, 215]
+        light_bounds = [0.60, 0.90]
+        saturation = 0.8
     elif palette == 'Amarelos':
-        hue_bounds = [48, 51]
-        saturation = 0.82
+        hue_bounds = [51, 55]
+        light_bounds = [0.65, 0.95]
+        saturation = 0.85
     elif palette == 'Cinzas':
         hue_bounds = [0, 360]
+        light_bounds = [0.35, 0.80]
         saturation = 0
     
     # Remaps the mean values to their respective hue value
@@ -150,7 +164,6 @@ def make_grad(parameters, palette, saturation):
         hue.append(hue_value)
     
     # Remaps the max values to their respective lightness value
-    light_bounds = [0.4, 0.9]
     lightness = []
 
     for value in list_of_max:
@@ -171,5 +184,9 @@ def make_grad(parameters, palette, saturation):
     
     # Adds white to the list as the background color
     rgb_colors.append([255, 255, 255])
+    rgb_colors.append([255, 255, 255])
+
+    # Shuffle the list os colors
+    shuffle(rgb_colors)
     
     return rgb_colors

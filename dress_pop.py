@@ -56,12 +56,11 @@ def main():
     print("Coletamos todos os parâmetros de som do seu texto.")
 
     # Creates the color palette based on user input
-    saturation = 0.7
     colors = []
     if input[1] == 'Monocromático':
         colors = make_mono(input[2])
     elif input[1] == 'Gradiente':
-        colors = make_grad(data[3], input[2], saturation)
+        colors = make_grad(data[3], input[2])
     print("Criamos uma paleta especial para sua arte, com base nesse som.")
     print("Trabalhando nas geometrias do seu quadro...")
     

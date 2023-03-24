@@ -95,7 +95,7 @@ def make_rhino(parameters, width, height, colors, margins):
     # Interpolates the points in a curve with start and end tangents
     # to the X-axis
     pline = r3dm.Polyline(points).ToNurbsCurve()
-    curve = compute_rhino3d.Curve.CreateFilletCornersCurve(pline, height/100,
+    curve = compute_rhino3d.Curve.CreateFilletCornersCurve(pline, height/75,
                                                             0.01, 0.1)
 
     # Creates the curve bounding box to get the center of the canvas
