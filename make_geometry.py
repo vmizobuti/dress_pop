@@ -24,7 +24,7 @@ def remap(value, old_domain, new_domain):
 
     return remapped_value
 
-def make_rhino(parameters, width, height, colors, margins):
+def make_geometry(parameters, width, height, colors, margins):
     """
     Creates all the geometry needed for the art based on rhino3dm
     and Rhino.Compute functions. This function returns the filename
@@ -41,6 +41,10 @@ def make_rhino(parameters, width, height, colors, margins):
     # Adjusts the width and height of the art by reducing the margin values
     width = width - (2 * margins)
     height = height - (2 * margins)
+
+    # Creates the Layers for the frame and the stroke lines
+    model.Layers.AddLayer("Frame", (255, 255, 255, 255))
+    model.Layers.AddLayer("Stroke", (255, 255, 255, 255))
 
     # Creates the Layers for each color in the art
     for i in range(len(colors)):
@@ -187,7 +191,7 @@ def make_rhino(parameters, width, height, colors, margins):
             color = key
             while i < len(columns[col]):
                 att = r3dm.ObjectAttributes()
-                att.LayerIndex = color
+                att.LayerIndex = color + 2
                 model.Objects.AddCurve(columns[col][i], att)
                 if color == (len(colors) - 1):
                     color = 0
@@ -202,10 +206,17 @@ def make_rhino(parameters, width, height, colors, margins):
     stroke = curve.Trim(t0, t1)
 
     # Adds a layer for the stroke curve and adds the curve to the model
-    model.Layers.AddLayer("Stroke", (255, 255, 255, 255))
     stroke_att = r3dm.ObjectAttributes()
-    stroke_att.LayerIndex = len(model.Layers) - 1
+    stroke_att.LayerIndex = 1
     model.Objects.AddCurve(stroke, stroke_att)
+    model.Layers[1].PlotWeight = (height * 10)/50
+
+    # Offsets the frame given the margin values and adds the curve to
+    # the model
+    frame_att = r3dm.ObjectAttributes()
+    frame_att.LayerIndex = 0
+    off_frame = Curve.Offset(frame.ToNurbsCurve(), pln, margins, 0.01, 1)[0]
+    model.Objects.AddCurve(off_frame, frame_att)
 
     # Saves the 3DM file after all geometric operations are completed
     model.Write('geometry.3dm')

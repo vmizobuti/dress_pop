@@ -145,8 +145,8 @@ def make_grad(parameters, palette):
         light_bounds = [0.30, 0.90]
         saturation = 0.8
     elif palette == 'Azuis':
-        hue_bounds = [190, 215]
-        light_bounds = [0.60, 0.90]
+        hue_bounds = [200, 210]
+        light_bounds = [0.50, 0.90]
         saturation = 0.8
     elif palette == 'Amarelos':
         hue_bounds = [51, 55]
@@ -183,7 +183,6 @@ def make_grad(parameters, palette):
         rgb_colors.append(rgb_color)
     
     # Adds white to the list as the background color
-    rgb_colors.append([255, 255, 255])
     rgb_colors.append([255, 255, 255])
 
     # Shuffle the list os colors
